@@ -11,6 +11,12 @@ public class RoomType {
         this.pricePerNight = pricePerNight;
     }
 
+    public RoomType(int id, String name, double pricePerNight) {
+        this.id = id;
+        this.name = name;
+        this.pricePerNight = (float)pricePerNight;
+    }
+
     // Getters and setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
