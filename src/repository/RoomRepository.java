@@ -2,10 +2,10 @@ package repository;
 
 import model.Room;
 
+import java.util.Optional;
+
 public interface RoomRepository {
 
-    public void addRoom(Room room);
-    public void updateRoom(Room room);
-    public void deleteRoom(Room room);
-    public  Room getRoom(int id);
+    Optional<Integer> addRoom(Room room);
+
 }

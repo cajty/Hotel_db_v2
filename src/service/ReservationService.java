@@ -6,6 +6,7 @@ import repository.ReservationRepositoryImpl;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class ReservationService {
     private final ReservationRepository reservationRepository;
@@ -35,7 +36,7 @@ public class ReservationService {
         }
 
         Reservation updatedReservation = new Reservation(startDate, endDate, userId, roomId);
-        updatedReservation.getIdReservation(idReservation);
+        updatedReservation.setIdReservation(idReservation);
         reservationRepository.updateReservation(updatedReservation);
         System.out.println("Reservation updated with ID: " + idReservation);
         return true;
@@ -63,12 +64,25 @@ public class ReservationService {
 
     private Integer isValidReservation(int idReservation, LocalDate startDate, LocalDate endDate) {
 
-        List<Reservation> reservations = reservationRepository.getAllReservationsOfRoomType();
-        for (Reservation reservation : reservations) {
-            if (startDate.isBefore(reservation.getEndDate()) && endDate.isAfter(reservation.getStartDate()) && !reservation.getIdReservation().equals(idReservation)) {
-                return null;
-            }
-        }
-        return 1; // Assuming roomId 1 for simplicity
+
+        Integer roomTypeId = reservationRepository.getRoomTypeIdByReservationID(idReservation);
+
+
+        List<Reservation> reservations = reservationRepository.getAllReservationsOfRoomType(roomTypeId);
+        Optional<Integer> availableRoomId = reservations.stream()
+                .filter(reservation ->
+                        startDate.isBefore(reservation.getEndDate())
+                                && endDate.isAfter(reservation.getStartDate())
+                                && !reservation.getIdReservation().equals(idReservation)
+                )
+                .map(Reservation::getRoomId)
+                .findFirst();
+
+        return availableRoomId.orElse(null);
     }
-}
+
+
+
+
+
+    }

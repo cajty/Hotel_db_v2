@@ -1,52 +1,19 @@
 package service;
 
-import model.RoomType;
-import repository.RoomTypeRepository;
-import repository.RoomTypeRepositoryImpl;
+import model.Room;
+import repository.RoomRepository;
+import repository.RoomRepositoryImpl;
 
-import java.util.List;
+import java.util.Optional;
 
 public class RoomService {
-    private RoomTypeRepository roomTypeRepository;
+    private  final  RoomRepository roomRepository;
 
-    public  RoomService() {
-        this.roomTypeRepository = new RoomTypeRepositoryImpl();
+    public RoomService() {
+        this.roomRepository = new RoomRepositoryImpl();
     }
 
-
-
-    public void addRoomType(String name, double pricePerNight) {
-        RoomType newRoomType = new RoomType(1, name, pricePerNight);
-
-        roomTypeRepository.addRoomType(newRoomType);
-    }
-
-    public List<RoomType> getAllRoomTypes() {
-        return roomTypeRepository.getAllRoomTypes();
-    }
-
-    public RoomType getRoomTypeById(int id) {
-        return roomTypeRepository.getRoomTypeById(id);
-    }
-
-    public boolean isRoomTypeAvailable(int id) {
-        RoomType roomType = getRoomTypeById(id);
-        return roomType != null;
-    }
-
-    public double calculateTotalPrice(int roomTypeId, int numberOfNights) {
-        RoomType roomType = getRoomTypeById(roomTypeId);
-        if (roomType == null) {
-            throw new IllegalArgumentException("Room type not found");
-        }
-        return roomType.getPricePerNight() * numberOfNights;
-    }
-
-
-    public void addrooms(){
-        System.out.println("number of room");
-        System.out.println("type of that room");
-
-
+    public Optional<Integer> addRoom(Room room) {
+        return roomRepository.addRoom(room);
     }
 }

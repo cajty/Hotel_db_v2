@@ -24,7 +24,7 @@ public class Reservation {
 
     // Getters and setters
     public Integer getIdReservation() { return id; }
-    public void getIdReservation(Integer id) { this.id = id; }
+    public void setIdReservation(Integer id) { this.id = id; }
     public LocalDate getStartDate() { return startDate; }
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
     public LocalDate getEndDate() { return endDate; }

@@ -3,6 +3,8 @@ package ui;
 import controller.ReservationController;
 import controller.UserController;
 import util.ScannerSingleton;
+
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Menu {
@@ -11,7 +13,7 @@ public class Menu {
     private static final ReservationController reservationController = new ReservationController();
     private static final UserController userController = new UserController();
 
-    // Main menu for choosing operations on reservations
+
     public static void menuOfChoose() {
         int userInput;
 
@@ -50,8 +52,8 @@ public class Menu {
         } while (userInput != 5);
     }
 
-    // Room type menu
-    public static Integer menuOfRoomType() {
+
+    public static Optional<Integer> menuOfRoomType() {
         int userInput;
         do {
             System.out.println("\n--Choose Room Type--\n" +
@@ -65,16 +67,14 @@ public class Menu {
             userInput = getValidInput();
 
             switch (userInput) {
-                case 1: return 1;
-                case 2: return 2;
-                case 3: return 3;
-                case 4: return null;  // Null indicates returning to the main menu
+                case 1: return Optional.of(1);
+                case 2: return Optional.of(2);
+                case 3: return Optional.of(3);
+                case 4: return Optional.empty();  // Optional.empty() indicates returning to the main menu
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-        } while (userInput != 4);
-
-        return null;  // Return to main menu
+        } while (true);  // Loop will continue until a valid choice is made
     }
 
     // Login menu
@@ -82,7 +82,7 @@ public class Menu {
         int userInput;
 
         do {
-            System.out.println("\n--Welcome to Hotel--\n" +
+            System.out.println("\n-- Hotel --\n" +
                     "========================================================================" +
                     "\n1- Login" +
                     "\n2- Signup" +
@@ -94,6 +94,7 @@ public class Menu {
             switch (userInput) {
                 case 1:
                     userController.loginUser();
+                    userInput = 3;
                     break;
                 case 2:
                     userController.registerUser();
@@ -124,13 +125,13 @@ public class Menu {
 
             switch (userInput) {
                 case 1:
-                    // Admin actions for single rooms
+
                     break;
                 case 2:
-                    // Admin actions for double rooms
+
                     break;
                 case 3:
-                    // Admin actions for family rooms
+
                     break;
                 case 4:
                     System.out.println("Returning to main menu...");
@@ -138,15 +139,16 @@ public class Menu {
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-        } while (userInput != 4);  // Loop will end when userInput is 4
+        } while (userInput != 4);
     }
 
 
-    // Helper method to validate user input
     private static int getValidInput() {
+
         while (!input.hasNextInt()) {
+            input.nextLine();
             System.out.println("Invalid input. Please enter a number.");
-            input.next();  // Clear the invalid input
+            input.next();
         }
         return input.nextInt();
     }

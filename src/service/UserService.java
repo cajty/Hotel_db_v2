@@ -35,7 +35,7 @@ public class UserService {
     }
 
     // Method to authenticate a user
-    public User loginUser(String email, String password) {
+    public void loginUser(String email, String password) {
         // Use the plain password for comparison
         User user = userRepository.loginUser(email, password);
 
@@ -43,11 +43,11 @@ public class UserService {
 
             LoginUser.setLoginUser(user.getId());
 
-            System.out.println("Login successful for user: " + LoginUser.getUserId());
+            System.out.println("Welcome: " + user.getFirstName() + " " + user.getLastName());
         } else {
             System.out.println("Invalid email or password.");
         }
 
-        return user;
+
     }
 }
