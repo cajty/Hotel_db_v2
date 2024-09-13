@@ -12,9 +12,9 @@ public interface ReservationRepository {
 
     Reservation getReservationById(int id);
 
-    Integer getRoomTypeIdByReservationID(Integer id);
+   List<Reservation> getAllReservations();
 
-    List<Reservation> getAllReservationsOfRoomType(int roomTypeId);
+
     List<Reservation> getAllReservationsOfUser(int userId);
 
     void updateReservation(Reservation reservation);

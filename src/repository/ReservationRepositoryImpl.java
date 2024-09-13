@@ -71,24 +71,26 @@ public boolean createReservation(Reservation reservation) {
         return null;
     }
 
+
+
     @Override
-    public List<Reservation> getAllReservationsOfRoomType(int roomTypeId) {
-        String sql = "SELECT * FROM reservations JOIN rooms ON reservations.room_id = rooms.id WHERE rooms.room_type_id = ? AND reservations.is_cancelled = false";
+    public List<Reservation> getAllReservations() {
+        String sql = "SELECT * FROM reservations ";
         List<Reservation> reservations = new ArrayList<>();
 
         try (Connection connection = DbConnection.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, roomTypeId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    reservations.add(createReservationFromResultSet(rs));
-                }
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                reservations.add(createReservationFromResultSet(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return reservations;
     }
+
+
 
     @Override
     public List<Reservation> getAllReservationsOfUser(int userId) {
@@ -137,23 +139,7 @@ public boolean createReservation(Reservation reservation) {
         }
     }
 
-    @Override
-    public Integer getRoomTypeIdByReservationID(Integer id) {
-        String sql = "SELECT room_type_id FROM reservations JOIN rooms ON reservations.room_id = rooms.id WHERE reservations.id = ?";
 
-        try (Connection connection = DbConnection.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("room_type_id");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     private void setReservationParameters(PreparedStatement stmt, Reservation reservation) throws SQLException {
         stmt.setInt(1, reservation.getUserId());
