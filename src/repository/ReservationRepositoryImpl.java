@@ -9,34 +9,49 @@ import model.Reservation;
 import util.DbConnection;
 
 public class ReservationRepositoryImpl implements ReservationRepository {
+@Override
+public boolean createReservation(Reservation reservation) {
+    String priceSql = "SELECT base_price * (EXTRACT(DAY FROM (?::timestamp - ?::timestamp))) AS price FROM room_types WHERE id = ?";
+    String insertSql = "INSERT INTO reservations (user_id, room_id, start_date, end_date, total_price, is_cancelled, refund_amount) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    @Override
-    public boolean createReservation(Reservation reservation) {
-        String sql = "INSERT INTO reservations (user_id, room_id, start_date, end_date, total_price, is_cancelled, refund_amount) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+    try (Connection connection = DbConnection.getInstance().getConnection();
+         PreparedStatement priceStmt = connection.prepareStatement(priceSql);
+         PreparedStatement insertStmt = connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
 
-        try (Connection connection = DbConnection.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            setReservationParameters(stmt, reservation);
-            int affectedRows = stmt.executeUpdate();
-
-            if (affectedRows == 0) {
-                return false;
-            }
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    int reservationId = generatedKeys.getInt(1);
-                    reservation.setId(reservationId);
-                    return true;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error creating reservation: " + e.getMessage());
-            e.printStackTrace();
+        // Calculate total price
+        priceStmt.setDate(1, java.sql.Date.valueOf(reservation.getEndDate()));
+        priceStmt.setDate(2, java.sql.Date.valueOf(reservation.getStartDate()));
+        priceStmt.setInt(3, reservation.getRoomId());
+        ResultSet priceRs = priceStmt.executeQuery();
+        if (priceRs.next()) {
+            float totalPrice = priceRs.getFloat("price");
+            reservation.setTotalPrice(totalPrice);
+        } else {
+            return false;
         }
-        return false;
+
+        // Insert reservation
+        setReservationParameters(insertStmt, reservation);
+        int affectedRows = insertStmt.executeUpdate();
+
+        if (affectedRows == 0) {
+            return false;
+        }
+
+        try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                int reservationId = generatedKeys.getInt(1);
+                reservation.setId(reservationId);
+                return true;
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("Error creating reservation: " + e.getMessage());
+        e.printStackTrace();
     }
+    return false;
+}
 
     @Override
     public Reservation getReservationById(int id) {

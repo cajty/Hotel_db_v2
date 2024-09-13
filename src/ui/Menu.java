@@ -58,9 +58,9 @@ public class Menu {
         do {
             System.out.println("\n--Choose Room Type--\n" +
                     "========================================================================" +
-                    "\n1- Single" +
-                    "\n2- Double" +
-                    "\n3- Family" +
+                    "\n1- Single Room" +
+                    "\n2- Double Room" +
+                    "\n3- SuiteSuite" +
                     "\n4- Return to Main Menu" +
                     "\n========================================================================");
 
