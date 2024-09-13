@@ -6,16 +6,13 @@ import util.ScannerSingleton;
 import java.util.Scanner;
 
 public class UserController {
-    private static UserService userService = new UserService();
+    private static final UserService userService = new UserService();
     private static final Scanner input = ScannerSingleton.getScanner();
 
     public void registerUser() {
-        System.out.println("Enter your first name:");
-        input.nextLine();
-        String firstName = input.nextLine();
-
-        System.out.println("Enter your last name:");
-        String lastName = input.nextLine();
+        System.out.println("Enter your name:");
+        input.nextLine(); // Consume the newline left-over
+        String name = input.nextLine();
 
         System.out.println("Enter your email:");
         String email = input.nextLine();
@@ -23,7 +20,7 @@ public class UserController {
         System.out.println("Enter your password:");
         String password = input.nextLine();
 
-        boolean isRegistered = userService.registerUser(firstName, lastName, email, password);
+        boolean isRegistered = userService.registerUser(name, email, password);
 
         if (isRegistered) {
             System.out.println("Registration successful!");
@@ -34,9 +31,8 @@ public class UserController {
 
     public void loginUser() {
         System.out.println("Enter your email:");
-        input.nextLine();
+        input.nextLine(); // Consume the newline left-over
         String email = input.nextLine();
-
 
         System.out.println("Enter your password:");
         String password = input.nextLine();

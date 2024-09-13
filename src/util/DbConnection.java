@@ -8,11 +8,12 @@ public class DbConnection {
     private static DbConnection instance;
     private Connection connection;
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/hotel";
+    private static final String URL = "jdbc:postgresql://localhost:5432/hotel-v2";
     private static final String USER = "postgres";
     private static final String PASSWORD = "password";
+
     private DbConnection() {
-        createConnection();
+        // The connection will be created when needed
     }
 
     public static DbConnection getInstance() {
@@ -32,7 +33,12 @@ public class DbConnection {
     }
 
     public Connection getConnection() {
-        if (connection == null) {
+        try {
+            if (connection == null || connection.isClosed()) {
+                createConnection();
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking connection status: " + e.getMessage());
             createConnection();
         }
         return connection;

@@ -7,9 +7,6 @@ import util.LoginUser;
 
 public class UserService {
 
-
-
-
     private final UserRepository userRepository;
 
     // Constructor to initialize UserRepository
@@ -18,17 +15,16 @@ public class UserService {
     }
 
     // Method to register a new user
-    public boolean registerUser(String firstName, String lastName, String email, String password) {
+    public boolean registerUser(String name, String email, String password) {
         if (userRepository.isEmailRegistered(email)) {
             System.out.println("Email already registered!");
             return false; // Email already exists
         }
 
         // Create the User object with the plain password
-        User user = new User(firstName, lastName, email, password);
+        User user = new User(name, email, password);
 
         // Add the user to the database
-
         userRepository.addUser(user);
         System.out.println("User registered successfully with ID: " + user.getId());
         return true;
@@ -40,14 +36,10 @@ public class UserService {
         User user = userRepository.loginUser(email, password);
 
         if (user != null) {
-
             LoginUser.setLoginUser(user.getId());
-
-            System.out.println("Welcome: " + user.getFirstName() + " " + user.getLastName());
+            System.out.println("Welcome: " + user.getName());
         } else {
             System.out.println("Invalid email or password.");
         }
-
-
     }
 }
