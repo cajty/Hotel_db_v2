@@ -39,6 +39,7 @@ public class DbConnection {
             }
         } catch (SQLException e) {
             System.err.println("Error checking connection status: " + e.getMessage());
+            System.out.println("Attempting to reconnect... \n EEEEEEEEE");
             createConnection();
         }
         return connection;
@@ -48,8 +49,6 @@ public class DbConnection {
         if (connection != null) {
             try {
                 connection.close();
-                connection = null;
-                System.out.println("Database connection closed successfully.");
             } catch (SQLException e) {
                 System.err.println("Failed to close database connection: " + e.getMessage());
             }

@@ -8,15 +8,16 @@ import java.util.Optional;
 public interface ReservationRepository {
 
 
-    Optional<Integer> createReservation(Reservation reservation);
+    boolean createReservation(Reservation reservation);
 
     Reservation getReservationById(int id);
 
     Integer getRoomTypeIdByReservationID(Integer id);
 
     List<Reservation> getAllReservationsOfRoomType(int roomTypeId);
+    List<Reservation> getAllReservationsOfUser(int userId);
 
     void updateReservation(Reservation reservation);
 
-    void deleteReservation(int id);
+    void cancelledReservation(int id);
 }

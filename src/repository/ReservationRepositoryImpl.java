@@ -9,39 +9,41 @@ import model.Reservation;
 import util.DbConnection;
 
 public class ReservationRepositoryImpl implements ReservationRepository {
-    private final Connection connection;
-
-    public ReservationRepositoryImpl() {
-        this.connection = DbConnection.getInstance().getConnection();
-    }
 
     @Override
-    public Optional<Integer> createReservation(Reservation reservation) {
+    public boolean createReservation(Reservation reservation) {
         String sql = "INSERT INTO reservations (user_id, room_id, start_date, end_date, total_price, is_cancelled, refund_amount) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = DbConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             setReservationParameters(stmt, reservation);
-            stmt.executeUpdate();
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                return false;
+            }
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     int reservationId = generatedKeys.getInt(1);
                     reservation.setId(reservationId);
-                    return Optional.of(reservationId);
+                    return true;
                 }
             }
         } catch (SQLException e) {
+            System.err.println("Error creating reservation: " + e.getMessage());
             e.printStackTrace();
         }
-        return Optional.empty();
+        return false;
     }
 
     @Override
     public Reservation getReservationById(int id) {
         String sql = "SELECT * FROM reservations WHERE id = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DbConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -59,7 +61,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         String sql = "SELECT * FROM reservations JOIN rooms ON reservations.room_id = rooms.id WHERE rooms.room_type_id = ? AND reservations.is_cancelled = false";
         List<Reservation> reservations = new ArrayList<>();
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DbConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, roomTypeId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -73,10 +76,31 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
+    public List<Reservation> getAllReservationsOfUser(int userId) {
+        String sql = "SELECT * FROM reservations JOIN rooms ON reservations.room_id = rooms.id WHERE reservations.user_id = ? AND reservations.is_cancelled = false";
+        List<Reservation> reservations = new ArrayList<>();
+
+        try (Connection connection = DbConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    reservations.add(createReservationFromResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return reservations;
+    }
+
+
+    @Override
     public void updateReservation(Reservation reservation) {
         String sql = "UPDATE reservations SET user_id = ?, room_id = ?, start_date = ?, end_date = ?, total_price = ?, is_cancelled = ?, refund_amount = ? WHERE id = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DbConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
             setReservationParameters(stmt, reservation);
             stmt.setInt(8, reservation.getId());
             stmt.executeUpdate();
@@ -86,10 +110,11 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public void deleteReservation(int id) {
+    public void cancelledReservation(int id) {
         String sql = "UPDATE reservations SET is_cancelled = true WHERE id = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DbConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -101,7 +126,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     public Integer getRoomTypeIdByReservationID(Integer id) {
         String sql = "SELECT room_type_id FROM reservations JOIN rooms ON reservations.room_id = rooms.id WHERE reservations.id = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DbConnection.getInstance().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {

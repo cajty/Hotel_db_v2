@@ -48,7 +48,7 @@ public class ReservationController {
 
     public void deleteReservation() {
         int reservationId = Helper.getIdReservationFromUser();
-        boolean success = reservationService.deleteReservation(reservationId);
+        boolean success = reservationService.cancelledReservation(reservationId);
         System.out.println(success ? "Reservation deleted successfully." : "Failed to delete reservation.");
     }
 

@@ -21,4 +21,8 @@ public class RoomService {
     public Optional<Integer> getIDRoomToReserve(LocalDate startDate, LocalDate endDate, int roomTypeId) {
         return roomRepository.getIDRoomToReserve(startDate, endDate, roomTypeId);
     }
+
+    public Optional<Integer> getIDRoomToReserve(LocalDate startDate, LocalDate endDate, int roomTypeId , int idReservation) {
+        return roomRepository.getIDRoomToReserve(startDate, endDate, roomTypeId, idReservation);
+    }
 }

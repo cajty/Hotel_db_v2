@@ -11,5 +11,6 @@ public interface RoomRepository {
 
     Optional<Integer> addRoom(Room room);
     Optional<Integer> getIDRoomToReserve(LocalDate checkIn, LocalDate checkOut, int roomTypeId);
+    Optional<Integer> getIDRoomToReserve(LocalDate checkIn, LocalDate checkOut, int roomTypeId, int idReservation);
 
 }
