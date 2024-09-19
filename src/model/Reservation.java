@@ -59,7 +59,7 @@ public class Reservation {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public LocalDate  getEndDate() {
         return endDate;
     }
 

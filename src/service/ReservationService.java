@@ -4,9 +4,11 @@ import model.Reservation;
 import repository.ReservationRepository;
 import repository.ReservationRepositoryImpl;
 
-import javax.sound.midi.MidiDeviceReceiver;
+
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+
 
 public class ReservationService {
     private final ReservationRepository reservationRepository;
@@ -17,20 +19,28 @@ public class ReservationService {
         this.reservationRepository = new ReservationRepositoryImpl();
     }
 
-    public boolean createReservation(int userId, LocalDate startDate, LocalDate endDate, int roomTypeID) {
-        Integer idRoom = roomService.getIDRoomToReserve(startDate, endDate, roomTypeID).orElse(null);
-        System.out.println( "d"+idRoom);
-        if (idRoom == null) {
-            System.out.println("No valid room found or the dates overlap with an existing reservation.");
-            return false;
-        }
-        Reservation reservation = new Reservation(userId, idRoom, startDate, endDate, 0.0f, false, 0.0f);
+   public boolean createReservation(int userId, LocalDate startDate, LocalDate endDate, int roomTypeID) {
+    Map<Integer, List<Reservation>> test = roomService.getIDRoomToReserve(startDate, endDate, roomTypeID);
+    System.out.println(test);
+
+    Integer idRoom = test.entrySet().stream()
+            .filter(r -> r.getValue().stream()
+                    .noneMatch(reservation -> reservation.getStartDate().isBefore(endDate) && reservation.getEndDate().isAfter(startDate)))
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElse(null);
 
 
-        return reservationRepository.createReservation(reservation);
 
-
+    System.out.println("idRoom: " + idRoom);
+    if (idRoom == null) {
+        System.out.println("No valid room found or the dates overlap with an existing reservation.");
+        return false;
     }
+
+    Reservation reservation = new Reservation(userId, idRoom, startDate, endDate, 0.0f, false, 0.0f);
+    return reservationRepository.createReservation(reservation);
+}
 
     public boolean updateReservation(int idReservation, LocalDate startDate, LocalDate endDate, int userId) {
         Reservation reservation = reservationRepository.getReservationById(idReservation);

@@ -1,7 +1,9 @@
 package repository;
 import model.Reservation;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -12,7 +14,7 @@ public interface ReservationRepository {
 
     Reservation getReservationById(int id);
 
-   List<Reservation> getAllReservations();
+    Map<Integer,Reservation> getAllActiveReservations(int roomTypeID);
 
 
     List<Reservation> getAllReservationsOfUser(int userId);
